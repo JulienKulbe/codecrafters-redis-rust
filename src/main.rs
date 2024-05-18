@@ -41,7 +41,7 @@ fn handle_connection(mut stream: TcpStream) -> Result<()> {
         let command = request[2].to_uppercase();
         let response = match command.as_str() {
             "PING" => "+PONG\r\n".to_string(),
-            "ECHO" => format!("$3\r\n{}\r\n", request[4]),
+            "ECHO" => format!("{}\r\n{}\r\n", request[3], request[4]),
             "CLIENT" => "+OK\r\n".to_string(),
             _ => bail!("unsupportd command: {}", command),
         };
