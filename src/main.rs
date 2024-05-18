@@ -2,6 +2,8 @@ use anyhow::Result;
 use std::{
     io::{BufRead, BufReader, Read, Write},
     net::{TcpListener, TcpStream},
+    thread,
+    time::Duration,
 };
 
 fn main() {
@@ -30,18 +32,27 @@ fn handle_connection(mut stream: TcpStream) -> Result<()> {
     // let request = String::from_utf8_lossy(&buffer);
     // println!(">> {request} ({bytes})");
 
-    let mut reader = BufReader::new(&mut stream);
-    let received: Vec<u8> = reader.fill_buf()?.to_vec();
+    loop {
+        let mut reader = BufReader::new(&mut stream);
 
-    let request = String::from_utf8_lossy(&received);
-    println!(">> {request} ({})", received.len());
+        let received: Vec<u8> = reader.fill_buf()?.to_vec();
+        if received.is_empty() {
+            thread::sleep(Duration::from_millis(100));
+            continue;
+        }
 
-    reader.consume(received.len());
+        let request = String::from_utf8_lossy(&received);
+        reader.consume(received.len());
+        println!(">> {request} ({})", received.len());
 
-    let response = "+PONG\r\n";
-    println!("<< {response}");
+        let lines: Vec<&str> = request.split_terminator("\r\n").collect();
+        let commands = lines.len() / 3;
 
-    stream.write_all(response.as_bytes())?;
+        for _ in 0..commands {
+            let response = "+PONG\r\n";
+            println!("<< {response}");
 
-    Ok(())
+            stream.write_all(response.as_bytes())?;
+        }
+    }
 }
