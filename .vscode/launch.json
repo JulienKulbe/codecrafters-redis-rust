@@ -1,0 +1,45 @@
+{
+  // Verwendet IntelliSense zum Ermitteln möglicher Attribute.
+  // Zeigen Sie auf vorhandene Attribute, um die zugehörigen Beschreibungen anzuzeigen.
+  // Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug executable 'redis-starter-rust'",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin=redis-starter-rust",
+          "--package=redis-starter-rust"
+        ],
+        "filter": {
+          "name": "redis-starter-rust",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in executable 'redis-starter-rust'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--bin=redis-starter-rust",
+          "--package=redis-starter-rust"
+        ],
+        "filter": {
+          "name": "redis-starter-rust",
+          "kind": "bin"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
