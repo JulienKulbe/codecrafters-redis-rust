@@ -30,8 +30,8 @@ fn handle_connection(mut stream: TcpStream) -> Result<()> {
         println!("{request_line}");
     }
 
-    let response = "+PONG\r\n";
-    stream.write_all(response.as_bytes())?;
+    //let response = b"+PONG\r\n";
+    stream.write(b"+PONG\r\n").unwrap();
 
     Ok(())
 }
