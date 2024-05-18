@@ -17,6 +17,7 @@ pub fn handle_connection(mut stream: TcpStream) -> Result<()> {
             "PING" => "+PONG\r\n".to_string(),
             "ECHO" => format!("${}\r\n{}\r\n", request.args[0].len(), request.args[0]),
             "CLIENT" => "+OK\r\n".to_string(),
+            "SET" => "+OK\r\n".to_string(),
             _ => bail!("unsupportd command: {}", request.command),
         };
 
