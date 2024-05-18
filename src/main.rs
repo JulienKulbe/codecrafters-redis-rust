@@ -1,9 +1,7 @@
-use anyhow::{bail, Result};
-use std::{
-    io::{Read, Write},
-    net::{TcpListener, TcpStream},
-    thread,
-};
+use crate::redis_server::handle_connection;
+use std::{net::TcpListener, thread};
+
+mod redis_server;
 
 fn main() {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -23,30 +21,5 @@ fn main() {
                 println!("error: {}", e);
             }
         }
-    }
-}
-
-fn handle_connection(mut stream: TcpStream) -> Result<()> {
-    loop {
-        let mut buffer = [0_u8; 512];
-
-        let bytes = stream.read(&mut buffer)?;
-        let request = String::from_utf8_lossy(&buffer);
-        println!(">> {request} ({bytes})");
-
-        let request = request.split("\r\n").collect::<Vec<&str>>();
-
-        // TODO verify request len
-
-        let command = request[2].to_uppercase();
-        let response = match command.as_str() {
-            "PING" => "+PONG\r\n".to_string(),
-            "ECHO" => format!("{}\r\n{}\r\n", request[3], request[4]),
-            "CLIENT" => "+OK\r\n".to_string(),
-            _ => bail!("unsupportd command: {}", command),
-        };
-
-        println!("<< :{response}");
-        stream.write_all(response.as_bytes())?;
     }
 }
