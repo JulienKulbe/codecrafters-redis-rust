@@ -14,7 +14,7 @@ fn main() {
         match stream {
             Ok(stream) => {
                 println!("accepted new connection");
-                _ = handle_connection(stream);
+                handle_connection(stream).unwrap();
             }
             Err(e) => {
                 println!("error: {}", e);
@@ -30,8 +30,8 @@ fn handle_connection(mut stream: TcpStream) -> Result<()> {
         println!("{request_line}");
     }
 
-    //let response = b"+PONG\r\n";
-    stream.write(b"+PONG\r\n").unwrap();
+    let response = "+PONG\r\n";
+    stream.write_all(b"+PONG\r\n")?;
 
     Ok(())
 }
