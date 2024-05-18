@@ -3,6 +3,7 @@ use std::{
     io::{BufRead, BufReader, BufWriter, Write},
     net::{TcpListener, TcpStream},
     thread,
+    time::Duration,
 };
 
 fn main() {
@@ -34,7 +35,9 @@ fn handle_connection(mut stream: TcpStream) -> Result<()> {
         let mut line = String::new();
         let received = reader.read_line(&mut line)?;
         if received == 0 {
-            return Ok(());
+            //return Ok(());
+            thread::sleep(Duration::from_millis(100));
+            continue;
         }
 
         let mut request = Vec::new();
