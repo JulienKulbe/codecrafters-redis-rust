@@ -33,3 +33,17 @@ Note: This section is for stages 2 and beyond.
    slow the first time you run it. Subsequent runs will be fast.
 1. Commit your changes and run `git push origin master` to submit your solution
    to CodeCrafters. Test output will be streamed to your terminal.
+
+# Test Clients
+
+## Via Cli
+
+`echo -ne '*1\r\n$4\r\nping\r\n' | nc localhost 6379`
+
+## Via Python Client
+
+```python
+import redis
+cli = redis.Redis()
+cli.ping()
+```

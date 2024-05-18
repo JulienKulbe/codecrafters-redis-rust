@@ -1,6 +1,6 @@
 use anyhow::Result;
 use std::{
-    io::{Read, Write},
+    io::{BufRead, BufReader, Read, Write},
     net::{TcpListener, TcpStream},
 };
 
@@ -24,16 +24,19 @@ fn main() {
 }
 
 fn handle_connection(mut stream: TcpStream) -> Result<()> {
-    // let buf_reader = BufReader::new(&mut stream);
-    // let request_lines = buf_reader.lines();
-    // for request_line in request_lines.map_while(Result::ok) {
-    //     println!("{request_line}");
-    // }
+    // let mut buffer = [0_u8; 12];
 
-    let mut buffer = [0_u8; 256];
-    let _ = stream.read(&mut buffer)?;
-    let request = String::from_utf8_lossy(&buffer);
-    println!(">> {request}");
+    // let bytes = stream.read(&mut buffer)?;
+    // let request = String::from_utf8_lossy(&buffer);
+    // println!(">> {request} ({bytes})");
+
+    let mut reader = BufReader::new(&mut stream);
+    let received: Vec<u8> = reader.fill_buf()?.to_vec();
+
+    let request = String::from_utf8_lossy(&received);
+    println!(">> {request} ({})", received.len());
+
+    reader.consume(received.len());
 
     let response = "+PONG\r\n";
     println!("<< {response}");
