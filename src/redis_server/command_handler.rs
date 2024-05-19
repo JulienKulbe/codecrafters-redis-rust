@@ -1,8 +1,8 @@
-use super::request::Request;
+use super::{request::Request, response::Response};
 use crate::redis_database::SharedDatabase;
 use anyhow::{bail, Result};
 
-pub fn handle_request(request: Request, database: SharedDatabase) -> Result<String> {
+pub fn handle_request(request: Request, database: SharedDatabase) -> Result<Response> {
     let command = request.command.to_ascii_uppercase();
     match command.as_str() {
         "PING" => ping(),
@@ -14,37 +14,37 @@ pub fn handle_request(request: Request, database: SharedDatabase) -> Result<Stri
     }
 }
 
-fn ping() -> Result<String> {
-    Ok("+PONG\r\n".to_string())
+fn ping() -> Result<Response> {
+    Ok(Response::simple("PONG"))
 }
 
-fn echo(args: &[String]) -> Result<String> {
+fn echo(args: &[String]) -> Result<Response> {
     if args.len() != 1 {
         bail!("Invalid number of arguments")
     }
 
-    Ok(format!("${}\r\n{}\r\n", args[0].len(), args[0]))
+    Ok(Response::bulk(&args[0]))
 }
 
-fn client() -> Result<String> {
-    Ok("+OK\r\n".to_string())
+fn client() -> Result<Response> {
+    Ok(Response::ok())
 }
 
-fn set_data(args: &[String], mut database: SharedDatabase) -> Result<String> {
+fn set_data(args: &[String], mut database: SharedDatabase) -> Result<Response> {
     if args.len() != 2 {
         bail!("Invalid number of arguments")
     }
 
     _ = database.set(args[0].clone(), args[1].clone());
 
-    Ok("+OK\r\n".to_string())
+    Ok(Response::ok())
 }
 
-fn get_data(args: &[String], database: SharedDatabase) -> Result<String> {
+fn get_data(args: &[String], database: SharedDatabase) -> Result<Response> {
     if args.len() != 1 {
         bail!("Invalid number of arguments")
     }
 
     let value = database.get(args[0].clone()).unwrap_or_default();
-    Ok(format!("${}\r\n{}\r\n", value.len(), value))
+    Ok(Response::bulk(&value))
 }

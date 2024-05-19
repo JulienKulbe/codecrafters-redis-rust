@@ -14,6 +14,7 @@ pub fn handle_connection(mut stream: TcpStream, database: SharedDatabase) -> Res
     loop {
         let request = Request::new(&mut stream)?;
         let response = handle_request(request, database.clone())?;
-        stream.write_all(response.as_bytes())?;
+        let data = String::from(response);
+        stream.write_all(data.as_bytes())?;
     }
 }
