@@ -1,6 +1,7 @@
 pub enum Response {
     SimpleString(String),
     BulkString(String),
+    NullBulkString,
 }
 
 impl Response {
@@ -22,6 +23,7 @@ impl From<Response> for String {
         match val {
             Response::SimpleString(str) => format!("+{str}\r\n"),
             Response::BulkString(str) => format!("${}\r\n{}\r\n", str.len(), str),
+            Response::NullBulkString => "$-1\r\n".to_string(),
         }
     }
 }

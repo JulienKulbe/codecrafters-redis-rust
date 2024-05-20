@@ -47,6 +47,9 @@ fn get_data(args: &[String], mut database: SharedDatabase) -> Result<Response> {
         bail!("Invalid number of arguments")
     }
 
-    let value = database.get(&args[0]).unwrap_or_default();
-    Ok(Response::bulk(&value))
+    if let Some(value) = database.get(&args[0]) {
+        Ok(Response::bulk(&value))
+    } else {
+        Ok(Response::NullBulkString)
+    }
 }
