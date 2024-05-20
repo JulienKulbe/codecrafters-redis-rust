@@ -3,12 +3,12 @@ use crate::redis_database::SharedDatabase;
 use anyhow::{bail, Result};
 
 pub fn handle_request(request: Request, database: SharedDatabase) -> Result<Response> {
-    let command = request.command.to_ascii_uppercase();
+    let command = request.command.clone();
     match command.as_str() {
         "PING" => ping(),
         "ECHO" => echo(&request.args),
         "CLIENT" => client(),
-        "SET" => set_data(&request.args, database),
+        "SET" => set_data(&request, database),
         "GET" => get_data(&request.args, database),
         _ => bail!("unsupportd command: {}", command),
     }
@@ -27,24 +27,26 @@ fn echo(args: &[String]) -> Result<Response> {
 }
 
 fn client() -> Result<Response> {
+    // TODO ignore client args for now and just respond with ok
     Ok(Response::ok())
 }
 
-fn set_data(args: &[String], mut database: SharedDatabase) -> Result<Response> {
-    if args.len() != 2 {
+fn set_data(request: &Request, mut database: SharedDatabase) -> Result<Response> {
+    if request.args.len() < 2 {
         bail!("Invalid number of arguments")
     }
 
-    _ = database.set(args[0].clone(), args[1].clone());
+    let px = request.get_argument_value("PX");
+    _ = database.set(&request.args[0], &request.args[1], px);
 
     Ok(Response::ok())
 }
 
-fn get_data(args: &[String], database: SharedDatabase) -> Result<Response> {
+fn get_data(args: &[String], mut database: SharedDatabase) -> Result<Response> {
     if args.len() != 1 {
         bail!("Invalid number of arguments")
     }
 
-    let value = database.get(args[0].clone()).unwrap_or_default();
+    let value = database.get(&args[0]).unwrap_or_default();
     Ok(Response::bulk(&value))
 }
