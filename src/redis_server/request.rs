@@ -84,7 +84,7 @@ impl<'a> RequestParser<'a> {
 
         let value = self.read_line()?;
         if value.len() != length {
-            bail!("Indalid line length");
+            bail!("Invalid line length");
         }
 
         Ok(value)
@@ -96,7 +96,7 @@ impl<'a> RequestParser<'a> {
 
         Ok(buffer
             .strip_suffix("\r\n")
-            .expect("Indalid line end")
+            .expect("Invalid line end")
             .to_string())
     }
 }
